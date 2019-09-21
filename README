@@ -1,0 +1,2 @@
+This is a module I quickly wrote to wrap the web API calls provided by Blockchain.info
+into an object-oriented-like API
