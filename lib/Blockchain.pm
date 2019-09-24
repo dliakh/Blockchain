@@ -1,7 +1,32 @@
+=head1 NAME
+
+Blockchain -- a set of modules to access Blockchain.info API in an object oriented way
+
+=head1 DESCRIPTION
+
+There are two "API" modules Blockchain::Wallet::API and Blockchain::ReceivePayment::API
+which represent Blockchain.info's L<Blockchain Wallet API|https://www.blockchain.com/api/blockchain_wallet_api> and L<Payment Processing API|https://www.blockchain.com/api/api_receive> respectively.
+
+=cut 
+
 our $VERSION = v0.01;
+
+=head2 Blockchain::Wallet::API::Role
+
+A definition of "contract" for the module representing the Blockchain Wallet API
+
+=cut
+
 package Blockchain::Wallet::API::Role;
 use Moose::Role;
 requires qw/create createHDAccount getActiveHDAccounts getHDAccount getHDXpubs addresses getAddressBalance generateAddress archiveAddress unarchiveAddress/;
+
+=head2 Blockchain::Wallet::API
+
+An object representing the Blockchain Wallet API
+
+=cut
+
 package Blockchain::Wallet::API;
 use Moose;
 with 'Blockchain::Wallet::API::Role';
@@ -12,8 +37,14 @@ use JSON;
 use List::Util qw/any/;
 has uri => (is => 'rw', isa => 'Str', default => 'http://localhost:3000', required => 1);
 has ua => (is => 'rw', isa => 'LWP::UserAgent', default => sub { LWP::UserAgent->new });
-# The 'create' API endpoint
-# Create a new blockchain wallet
+
+=head3 create
+
+The 'create' API endpoint
+Create a new blockchain wallet
+
+=cut
+
 sub create {
     my $self = shift;
     my %opts = @_;
@@ -27,7 +58,13 @@ sub create {
         unless $res->is_success;
     return decode_json($res->content);
 }
-# The API endpoint '/merchant/:guid/accounts/create'
+
+=head3 createHDAccount
+
+The API endpoint '/merchant/:guid/accounts/create'
+
+=cut
+
 sub createHDAccount {
     my $self = shift;
     my %opts = @_;
@@ -43,8 +80,14 @@ sub createHDAccount {
         unless $res->is_success;
     return decode_json($res->content);
 }
-# List active HD accounts
-# The API endpoint '/merchant/:guid/accounts'
+
+=head3 getActiveHDAccounts
+
+List active HD accounts
+The API endpoint '/merchant/:guid/accounts'
+
+=cut
+
 sub getActiveHDAccounts {
     my $self = shift;
     my %opts = @_;
@@ -59,8 +102,14 @@ sub getActiveHDAccounts {
         unless $res->is_success;
     return decode_json($res->content);
 }
-# Get single HD account
-# The API endpoint '/merchant/:guid/accounts/:xpub_or_index'
+
+=head3 getHDAccount
+
+Get single HD account
+The API endpoint '/merchant/:guid/accounts/:xpub_or_index'
+
+=cut
+
 sub getHDAccount {
     my $self = shift;
     my %opts = @_;
@@ -76,8 +125,14 @@ sub getHDAccount {
         unless $res->is_success;
     return decode_json($res->content);
 }
-# List HD xpubs
-# The API endpoint '/merchant/:guid/accounts/xpubs'
+
+=head3 getHDXpubs
+
+List HD xpubs
+The API endpoint '/merchant/:guid/accounts/xpubs'
+
+=cut
+
 sub getHDXpubs {
     my $self = shift;
     my %opts = @_;
@@ -92,8 +147,14 @@ sub getHDXpubs {
         unless $res->is_success;
     return decode_json($res->content);
 }
-# List addresses
-# The Blockchain 'list' API endpoint
+
+=head3 addresses
+
+List addresses
+The Blockchain 'list' API endpoint
+
+=cut
+
 sub addresses {
     my $self = shift;
     my %opts = @_;
@@ -106,8 +167,14 @@ sub addresses {
         unless $res->is_success;
     return decode_json($res->content);
 }
-# Fetch the address balance
-# The Blockchain 'address_balance' API endpoint
+
+=head3 getAddressBalance
+
+Fetch the address balance
+The Blockchain 'address_balance' API endpoint
+
+=cut
+
 sub getAddressBalance {
     my $self = shift;
     my %opts = @_;
@@ -120,8 +187,14 @@ sub getAddressBalance {
         unless $res->is_success;
     return decode_json($res->content);
 }
-# Generate a new address
-# The Blockchain API 'new_address' endpoint
+
+=head3 generateAddress
+
+Generate a new address
+The Blockchain API 'new_address' endpoint
+
+=cut
+
 sub generateAddress {
     my $self = shift;
     my %opts = @_;
@@ -141,8 +214,14 @@ sub generateAddress {
         unless $res->is_success;
     return decode_json($res->content);
 }
-# Archive an address
-# The 'archive_address' Blockchain API endpoint
+
+=head3 archiveAddress
+
+Archive an address
+The 'archive_address' Blockchain API endpoint
+
+=cut
+
 sub archiveAddress {
     my $self = shift;
     my %opts = @_;
@@ -158,8 +237,14 @@ sub archiveAddress {
         unless $res->is_success;
     return decode_json($res->content);
 }
-# Unarchive an address
-# The 'unarchive_address' Blockchain API endpoint
+
+=head3 unarchiveAddress
+
+Unarchive an address
+The 'unarchive_address' Blockchain API endpoint
+
+=cut
+
 sub unarchiveAddress {
     my $self = shift;
     my %opts = @_;
@@ -175,6 +260,13 @@ sub unarchiveAddress {
         unless $res->is_success;
     return decode_json($res->content);
 }
+
+=head2 Blockchain::Wallet::Address
+
+An object orinted representation of an address entity in the Blockchain.info Wallet API
+
+=cut
+
 package Blockchain::Wallet::Address;
 use Moose;
 has wallet => (is => 'rw', isa => 'Blockchain::Wallet');
@@ -182,18 +274,39 @@ has balance => (is => 'rw', isa => 'Num');
 has address => (is => 'rw', isa => 'Str');
 has label => (is => 'rw', isa => 'Str');
 has total_received => (is => 'rw', isa => 'Num');
+
+=head3 name archive
+
+Archive the address
+
+=cut
+
 sub archive {
     my $self = shift;
     
     $self->wallet->archiveAddress(address => $self->address);
     return;
 }
+
+=head3 unarchive
+
+Unarchive the address
+
+=cut
+
 sub unarchive {
     my $self = shift;
 
     $self->wallet->unarchiveAddress(address => $self->address);
     return;
 }
+
+=head2 Blockchain::Wallet
+
+An object oriented representation of the Blockchain.info Wallet API
+
+=cut
+
 package Blockchain::Wallet;
 use Moose;
 has api => (is => 'rw', isa => 'Blockchain::Wallet::API', required => 1);
@@ -201,6 +314,13 @@ has guid => (is => 'rw', isa => 'Str', required => 1);
 has label => (is => 'rw', isa => 'Str');
 has address => (is => 'rw', isa => 'Str');
 has password => (is => 'rw', isa => 'Str');
+
+=head3 createHDAccount
+
+Create a new account. Returns a L</Blockchain::Wallet::Account> object
+
+=cut
+
 sub createHDAccount {
     my $self = shift;
     my %opts = @_;
@@ -228,6 +348,13 @@ sub createHDAccount {
         %accountData
     );
 }
+
+=head3 accounts
+
+Return a reference to a list of L</Blockchain::Wallet::Account> objects representing the accounts for the corresponding wallet
+
+=cut
+
 sub accounts {
     my $self = shift;
 
@@ -242,6 +369,13 @@ sub accounts {
             password => $self->password,
         ) }];
 }
+
+=head3 archiveAddress
+
+Archive an address. Accepts one mandatory option -- an address to be archieved (as a plain text)
+
+=cut
+
 sub archiveAddress {
     my $self = shift;
     my %opts = @_;
@@ -253,6 +387,13 @@ sub archiveAddress {
     );
     return;
 }
+
+=head3 unarchiveAddress
+
+Unarchive an address. Accepts one mandatory option -- an address to be archieved (as a plain text)
+
+=cut
+
 sub unarchiveAddress {
     my $self = shift;
     my %opts = @_;
@@ -264,6 +405,14 @@ sub unarchiveAddress {
     );
     return;
 }
+
+=head3 addresses
+
+Return a reference to a list of L</Blockchain::Wallet::Address> objects
+representing addresses available from the respective wallet
+
+=cut
+
 sub addresses {
     my $self = shift;
     
@@ -275,9 +424,23 @@ sub addresses {
         password => $self->password
     )->{addresses}}];
 }
+
+=head2 Blockchain::Wallet::Account::Role
+
+A "contract" for the Blockchain.info API representation
+
+=cut
+
 package Blockchain::Wallet::Account::Role;
 use Moose::Role;
 requires qw/index label archived extendedPublicKey extendedPrivateKey extendedPrivateKey receiveIndex lastUsedReceiveIndex receiveAddress/;
+
+=head2 Blockchain::Wallet::Account
+
+An object representing an account of the Blockchain.info's Wallet API
+
+=cut
+
 package Blockchain::Wallet::Account;
 use Moose;
 has wallet => (is => 'rw', isa => 'Blockchain::Wallet', required => 1);
@@ -325,7 +488,7 @@ sub build_balance {
 
 package Blockchain::ReceivePayment::API::Role;
 use Moose::Role;
-requires 'receive';
+requires qw/receive checkgap balance_update block_notification/;
 
 package Blockchain::ReceivePayment::API;
 use Moose;
@@ -338,6 +501,13 @@ use JSON;
 has uri => (is => 'rw', isa => 'Str', required => 1, default => 'https://api.blockchain.info');
 has key => (is => 'rw', isa => 'Str', required => 1);
 has ua => (is => 'rw', isa => 'LWP::UserAgent', required => 1, default => sub {LWP::UserAgent->new});
+
+=head3 receive
+
+Generate a receiving address, set up a callback to be called when the address recieves a payment
+
+=cut
+
 sub receive {
     my $self = shift;
     my %opts = @_;
@@ -354,6 +524,13 @@ sub receive {
         unless $res->is_success;
     return decode_json($res->content);
 }
+
+=head3 balance_update
+
+Monitor addresses for received and spent payments
+
+=cut
+
 sub balance_update {
     my $self = shift;
     my %opts = @_;
@@ -368,6 +545,13 @@ sub balance_update {
         unless $res->is_success;
     return decode_json($res->content);
 }
+
+=head3 block_notification
+
+Request callbacks when a new block of a specified height and confirmation number is added to the blockchain
+
+=cut
+
 sub block_notification {
     my $self = shift;
     my %opts = @_;
@@ -382,6 +566,13 @@ sub block_notification {
         unless $res->is_success;
     return decode_json($res->content);
 }
+
+=head3 checkgap
+
+Check the index gap between last address paid to and the last address generated
+
+=cut
+
 sub checkgap {
     my $self = shift;
     my %opts = @_;
