@@ -9,6 +9,8 @@ which represent Blockchain.info's L<Blockchain Wallet API|https://www.blockchain
 
 =cut 
 
+# This package is defined to only contain the version information
+package Blockchain;
 our $VERSION = v0.01;
 
 =head2 Blockchain::Wallet::API::Role
