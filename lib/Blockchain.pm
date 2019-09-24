@@ -295,7 +295,7 @@ with 'Blockchain::Wallet::Account::Role';
 # (which is dependent on something else in other words: API, database maybe, etc.)
 package Blockchain::Wallet::Account::Decorator;
 use Moose;
-extends 'Blockhain::Wallet::Account';
+extends 'Blockchain::Wallet::Account';
 # the following should probably reside in a separate unit
 # anyway:
 # (the following methods and fields are accesing the API(es))
